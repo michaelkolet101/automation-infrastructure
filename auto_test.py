@@ -3,23 +3,99 @@ import os
 
 PATH = str(pathlib.Path(__file__).parent.resolve())
 
+def make_init_py(path):
+    pathlib.Path(path + "/__init__.py").touch()
+
+def make_base_obj():
+    f = open(r"C:\Users\micha\Desktop\projects\automation-infrastructure\src\models\baseObj.py", "w")
+    to_write = """
+import json
+
+
+class baseObj:
+
+
+    def to_json(self) -> str:
+        #return json.dumps(self.__dict__)
+        result = {}
+        for key, val  in self.__dict__.items():
+            if val is not None:
+                if key.startswith("_"):
+                    result[key[1:]] = val
+                else:
+                    result[key] = val
+        return result
+
+
+    def __str__(self):
+        return json.dumps(self.to_json())
+    
+    """
+
+    f.write(to_write)
+    f.close()
+
+
+def make_base_page():
+
+    f = open(r"C:\Users\micha\Desktop\projects\automation-infrastructure\src\pages\base.py", "w")
+    to_write = """
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+
+
+
+class Base_page:
+    def __init__(self, driver: webdriver):
+        self._driver = driver
+
+
+
+    def find_element(self, by_find, token, wait=5):
+        elem = WebDriverWait(self._driver, wait).until(EC.presence_of_element_located((by_find, token)))
+        return elem
+
+    def find_elements(self, by_find, token):
+        elements = self._driver.find_elements(by_find, token)
+        return elements
+
+    def close(self):
+        self._driver.quit()
+    """
+    f.write(to_write)
+    f.close()
+
 
 def make_directorys_and_files():
+    make_init_py(PATH)
     dirs = ["/src", "/test", "/API"]
     for itm in dirs:
         path_to = PATH + itm
         os.mkdir(path_to)
+        make_init_py(path_to)
 
     test_path = PATH + "/test"
+    src_path = PATH + "/src"
+    api_path = PATH + "/API"
 
     pathlib.Path(test_path + "/pytest.ini").touch()
     pathlib.Path(test_path + "/conftest.py").touch()
     pathlib.Path(test_path + "/pytest.ini").touch()
 
+    pages_dir = src_path + "/pages"
+    os.mkdir(pages_dir)
+    make_init_py(pages_dir)
+    pathlib.Path(pages_dir + "/base.py").touch()
+    make_base_page()
 
-
-
-
+    models_dir = src_path + "/models"
+    os.mkdir(models_dir)
+    make_init_py(models_dir)
+    pathlib.Path(models_dir + "/baseObj.py").touch()
+    make_base_obj()
 
 def make_ini():
     f = open("test/pytest.ini", 'w')
@@ -35,9 +111,18 @@ def make_ini():
 
 def make_gitignore():
     f = open(".gitignore", 'w')
-    to_write = "*\n!.py"
+    to_write = """
+    *
+    !*.py
+    !*.gitignore
+    !*.txt
+    !*.md
+    
+    """
     f.write(to_write)
     f.close()
+
+
 
 
 def make_conftest():
