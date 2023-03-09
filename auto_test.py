@@ -2,12 +2,12 @@ import pathlib
 import os
 
 PATH = str(pathlib.Path(__file__).parent.resolve())
-
+print(PATH)
 def make_init_py(path):
     pathlib.Path(path + "/__init__.py").touch()
 
 def make_base_obj():
-    f = open(r"C:\Users\micha\Desktop\projects\automation-infrastructure\src\models\baseObj.py", "w")
+    f = open(rf"{PATH}\src\models\baseObj.py", "w")
     to_write = """
 import json
 
@@ -38,7 +38,7 @@ class baseObj:
 
 def make_base_page():
 
-    f = open(r"C:\Users\micha\Desktop\projects\automation-infrastructure\src\pages\base.py", "w")
+    f = open(rf"{PATH}\src\pages\base.py", "w")
     to_write = """
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -80,6 +80,8 @@ def make_directorys_and_files():
     test_path = PATH + "/test"
     src_path = PATH + "/src"
     api_path = PATH + "/API"
+    Screenshots = PATH + "/Screenshots"
+    reports = PATH + "/reports"
 
     pathlib.Path(test_path + "/pytest.ini").touch()
     pathlib.Path(test_path + "/conftest.py").touch()
@@ -96,6 +98,9 @@ def make_directorys_and_files():
     make_init_py(models_dir)
     pathlib.Path(models_dir + "/baseObj.py").touch()
     make_base_obj()
+
+    os.mkdir(Screenshots)
+    os.mkdir(reports)
 
 def make_ini():
     f = open("test/pytest.ini", 'w')
@@ -193,9 +198,9 @@ webdriver-manager
 
 
 def main():
-    make_directorys_and_files()
     make_gitignore()
     make_requirements()
+    make_directorys_and_files()
     make_ini()
     make_conftest()
 
