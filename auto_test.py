@@ -1,22 +1,26 @@
 import pathlib
 import os
+import sys
 
-PATH = str(pathlib.Path(__file__).parent.resolve())
+PATH = ""
+
+if len(sys.argv) > 1:
+    PATH = sys.argv[1]
+else:
+    PATH = str(pathlib.Path(__file__).parent.resolve())
 
 def make_init_py(path):
     pathlib.Path(path + "/__init__.py").touch()
 
 def make_base_obj():
-    f = open(r"C:\Users\micha\Desktop\projects\automation-infrastructure\src\models\baseObj.py", "w")
+    f = open(rf"{PATH}\src\models\baseObj.py", "w")
     to_write = """
 import json
 
-
 class baseObj:
 
-
     def to_json(self) -> str:
-        #return json.dumps(self.__dict__)
+        
         result = {}
         for key, val  in self.__dict__.items():
             if val is not None:
@@ -25,7 +29,6 @@ class baseObj:
                 else:
                     result[key] = val
         return result
-
 
     def __str__(self):
         return json.dumps(self.to_json())
@@ -38,7 +41,7 @@ class baseObj:
 
 def make_base_page():
 
-    f = open(r"C:\Users\micha\Desktop\projects\automation-infrastructure\src\pages\base.py", "w")
+    f = open(rf"{PATH}\src\pages\base.py", "w")
     to_write = """
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -51,8 +54,6 @@ from selenium.webdriver.support import expected_conditions as EC
 class Base_page:
     def __init__(self, driver: webdriver):
         self._driver = driver
-
-
 
     def find_element(self, by_find, token, wait=5):
         elem = WebDriverWait(self._driver, wait).until(EC.presence_of_element_located((by_find, token)))
@@ -79,7 +80,6 @@ def make_directorys_and_files():
 
     test_path = PATH + "/test"
     src_path = PATH + "/src"
-    api_path = PATH + "/API"
 
     pathlib.Path(test_path + "/pytest.ini").touch()
     pathlib.Path(test_path + "/conftest.py").touch()
@@ -88,6 +88,7 @@ def make_directorys_and_files():
     pages_dir = src_path + "/pages"
     os.mkdir(pages_dir)
     make_init_py(pages_dir)
+
     pathlib.Path(pages_dir + "/base.py").touch()
     make_base_page()
 
@@ -98,7 +99,7 @@ def make_directorys_and_files():
     make_base_obj()
 
 def make_ini():
-    f = open("test/pytest.ini", 'w')
+    f = open(f"{PATH}/test/pytest.ini", 'w')
 
     to_write = "[pytest]\nlog_format = %(asctime)s %(levelname)s" \
                " %(message)s\nlog_date_format = %Y-%m-%d %H:%M:%S\nlog_cli = true" \
@@ -110,24 +111,21 @@ def make_ini():
 
 
 def make_gitignore():
-    f = open(".gitignore", 'w')
+    f = open(f"{PATH}/.gitignore", 'w')
     to_write = """
-    *
-    !*.py
-    !*.gitignore
-    !*.txt
-    !*.md
+*
+!*.py
+!*.gitignore
+!*.txt
+!*.md
     
     """
     f.write(to_write)
     f.close()
 
 
-
-
 def make_conftest():
-
-    f = open("test/conftest.py", 'w')
+    f = open(f"{PATH}/test/conftest.py", 'w')
     to_write = """
 import requests
 import pytest
@@ -138,7 +136,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
-
 
 
 logging.basicConfig(level=logging.INFO)
@@ -179,7 +176,7 @@ def setup(get_url):
     f.close()
 
 def make_requirements():
-    f = open("requirements.txt", "w")
+    f = open(f"{PATH}/requirements.txt", "w")
     to_write = """
 selenium
 pytest
@@ -199,4 +196,5 @@ def main():
     make_ini()
     make_conftest()
 
-main()
+if __name__ == '__main__':
+    main()
